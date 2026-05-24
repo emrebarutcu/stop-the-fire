@@ -1,0 +1,9 @@
+rank,strategy,n_runs,mean_burned_pct,std_burned_pct,mean_runtime_ms
+1,one_step_lookahead,594,27.464,19.387,2.2479
+2,betweenness_front,594,38.487,24.26,17.6279
+3,max_white_neighbors,594,41.466,26.349,0.2531
+4,hybrid_density_aware,594,42.203,26.418,36.0025
+5,max_degree,594,42.445,26.734,0.2394
+6,min_damage_cut,594,42.612,26.588,50.2929
+7,min_cut_edge_front,594,43.432,27.445,11.0958
+8,random,594,70.117,19.0,0.2263

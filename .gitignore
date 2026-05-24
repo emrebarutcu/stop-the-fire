@@ -1,0 +1,14 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+.netlify/
+.run-logs/
+final suite/backend/cache/
+final suite/.git/
+final suite/.claude/
+*.egg-info/
+dist/
+build/
+.env

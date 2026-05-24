@@ -1,0 +1,19 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# All /api/* calls from the SPA are transparently proxied to the Hugging
+# Face Space hosting the FastAPI backend. The Space URL is fixed by HF as
+# https://<user>-<space>.hf.space.
+[[redirects]]
+  from = "/api/*"
+  to = "https://ebarutcu-firefighter-ie492.hf.space/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for client-side routing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

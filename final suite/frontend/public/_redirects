@@ -1,0 +1,2 @@
+/api/*    https://ebarutcu-firefighter-ie492.hf.space/api/:splat    200!
+/*        /index.html                                                200

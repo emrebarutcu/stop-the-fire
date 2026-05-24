@@ -1,0 +1,20 @@
+.git
+.gitignore
+.claude
+.run-logs
+.DS_Store
+**/.DS_Store
+**/__pycache__
+backend/.venv
+backend/__pycache__
+# Ship only the Köyceğiz tile; the other tiles (~230 MB) are downloaded on demand.
+backend/cache/tiles/N36E030.tif
+backend/cache/tiles/N39E027.tif
+backend/cache/tiles/N39E030.tif
+frontend/node_modules
+frontend/dist
+slides
+map-to-graph engine
+*.md
+*.pptx
+run.sh
