@@ -12,3 +12,10 @@ final suite/.claude/
 dist/
 build/
 .env
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz

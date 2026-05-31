@@ -1,20 +1,57 @@
-# Stop the Fire!
-## A Network Optimization Approach to Wildfire Containment in the Köyceğiz–Marmaris Region
-
-**IE 492 — Senior Design Project · Final Report**
-**Department of Industrial Engineering, Boğaziçi University**
-**May 2026**
-
-**Team**
-Efe Ergen (2021402168)
-Emre Barutçu (2023402219)
-Mehmet Efe Aloğlu (2020402024)
-Kerem Külünkoğlu (2023402222)
-
-**Supervisor**
-Prof. Tınaz Ekim
-
 ---
+mainfont: "Charter"
+monofont: "Menlo"
+fontsize: 11pt
+geometry: margin=1in
+linestretch: 1.15
+colorlinks: true
+linkcolor: NavyBlue
+urlcolor: Blue
+header-includes:
+  - \usepackage{xcolor}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \usepackage{newunicodechar}
+  - \usepackage{amssymb}
+  - \newunicodechar{→}{\ensuremath{\rightarrow}}
+  - \newunicodechar{←}{\ensuremath{\leftarrow}}
+  - \newunicodechar{≈}{\ensuremath{\approx}}
+  - \newunicodechar{∈}{\ensuremath{\in}}
+  - \newunicodechar{≥}{\ensuremath{\geq}}
+  - \newunicodechar{≤}{\ensuremath{\leq}}
+  - \newunicodechar{×}{\ensuremath{\times}}
+  - \newunicodechar{₁}{\ensuremath{_1}}
+  - \newunicodechar{₂}{\ensuremath{_2}}
+  - \newunicodechar{²}{\ensuremath{^2}}
+  - \newunicodechar{▶}{\ensuremath{\blacktriangleright}}
+  - \renewcommand{\contentsname}{Contents}
+---
+
+\begin{titlepage}
+\thispagestyle{empty}
+\vspace*{6em}
+\begin{center}
+{\itshape IE\,492 — Senior Design Project · Final Report}\\[3em]
+{\fontsize{32pt}{36pt}\selectfont\bfseries Stop the Fire!}\\[1.2em]
+\rule{0.6\textwidth}{0.4pt}\\[1.2em]
+{\large\itshape A network optimization approach to wildfire\\
+containment in the Köyceğiz–Marmaris region}\\[1.2em]
+\rule{0.6\textwidth}{0.4pt}\\[4em]
+{\bfseries Team}\\[0.4em]
+Efe Ergen \quad·\quad 2021402168\\
+Emre Barutçu \quad·\quad 2023402219\\
+Mehmet Efe Aloğlu \quad·\quad 2020402024\\
+Kerem Külünkoğlu \quad·\quad 2023402222\\[2.5em]
+{\bfseries Supervisor}\\[0.4em]
+Prof. Tınaz Ekim\\[6em]
+Department of Industrial Engineering\\
+Boğaziçi University\\
+May 2026
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
 
 ## Abstract
 
@@ -24,13 +61,21 @@ Wildfires in the eastern Mediterranean have become more frequent and more destru
 
 ---
 
+## Özet
+
+Doğu Akdeniz'de orman yangınları son on yılda hem sıklık hem de tahribat açısından belirgin biçimde artmıştır; buna karşın Orman Genel Müdürlüğü'nün (OGM) saha doktrini büyük ölçüde tepkiseldir: yangın tespit edilir, yer ekipleri sevk edilir ve alev cephesi yayılmaya başladıktan sonra söndürülmeye çalışılır. Bu proje, küçük sayıda müdahale biriminin gerçek bir orman örüntüsünün *hangi* bölümlerini, cephe oraya ulaşmadan önce öncelikli olarak savunması gerektiğini öneren proaktif ve çizge-kuramsal bir karar destek aracı geliştirir. Orman örüntüsü, uydu arazi-örtüsü verilerinden ve açık yol/akarsu haritalarından çıkarılan bir düzlemsel çizge olarak modellenir; yangın yayılımı bu çizge üzerinde ayrık ve determinist bir süreç olarak benzetilir; yedi ilkeli sınırlama stratejisi ile rastgele bir taban modeli, 4.752 kontrollü sentetik koşu ve gerçek Köyceğiz–Marmaris örneği üzerinde karşılaştırılır. Stratejiler üç düşünce ailesine ayrılır: yerel açgözlü yaklaşımlar (anlık olarak en uygun görünen düğümü korur), küresel yapısal yaklaşımlar (çizgedeki doğal darboğazları arar) ve tek-adım ileri bakışlı politika (motorun kendisini kendi karar süreci içinde benzetir). 4.752 sentetik Delaunay koşusunda tek-adım ileri bakışlı politika ağın ortalama %27,5'ini yakar; rastgele seçim ise ortalama %70,1'ini yakar — yaklaşık 43 puanlık fark, hareket başına yaklaşık 2 milisaniyelik maliyetle elde edilir. Gerçek Köyceğiz haritasında (101 düğüm, 50.280 ha orman, 172 aktif kenar, hareket başına k = 2 itfaiyeci) aynı politika yangını ağın %16,8'inde durdurur. Tüm hat, FastAPI tabanlı arka uç ve React/Leaflet ön uçla sarmalanmış bir web uygulamasında sunulur; bu sayede bir orman planlayıcısı harita üzerine bir sınırlama kutusu çizerek karşılık gelen çizgeyi yaklaşık bir saniyede üretebilir, yangın başlangıç düğümünü seçebilir ve savunulacak düğümlerin sıralı bir listesini, ayrıca topolojiye özgü stratejinin neden seçildiğini açıklayan bir öneri kartıyla birlikte görebilir.
+
+**Anahtar Kelimeler:** İtfaiyeci Problemi, orman yangını sınırlaması, ağ eniyilemesi, düzlemsel çizgeler, en küçük kesim, ileri bakışlı sezgiseller, karar destek, CBS, ESA WorldCover.
+
+---
+
 ## 1. Introduction
 
 ### 1.1 The industrial engineering problem
 
 Containing a wildfire is, at its core, a sequential decision problem under tight resource constraints. The fire spreads in time, intervention units are scarce, and at every operational step the planner has to decide which patches of forest to defend first so that the *total* damaged area at the end of the campaign is as small as possible. The question is not how to put a fire out: once the canopy is burning, restoration is on the order of decades, so the only productive lever is *prevention of spread*. That reframing turns a physical phenomenon into a graph-theoretic optimization problem with a clear objective function (total burned vertices), a hard constraint (k vertices defended per turn), and a non-trivial combinatorial structure (the same k units placed at different points yield very different total damage depending on the topology of the surrounding network).
 
-This is the *Firefighter Problem*, introduced by Hartnell in 1995 and known to be NP-hard on general graphs, NP-hard even on trees of bounded degree, and still APX-hard on planar graphs of maximum degree four. The Firefighter Problem is therefore exactly the kind of question industrial engineering tools are designed for: a polynomial-time exact solution is out of reach, but well-chosen heuristics and structural insights can move the burned fraction by tens of percentage points. Our project takes this framework, adapts it to a real Turkish landscape (Köyceğiz–Marmaris), and packages the resulting heuristics into a decision-support tool that a forestry planner can actually use.
+This is the *Firefighter Problem*, introduced by Hartnell in 1995 [1] and known to be NP-hard on general graphs [2], NP-hard even on trees of bounded degree [3], and still APX-hard on planar graphs of maximum degree four [4]. The Firefighter Problem is therefore exactly the kind of question industrial engineering tools are designed for: a polynomial-time exact solution is out of reach, but well-chosen heuristics and structural insights can move the burned fraction by tens of percentage points. Our project takes this framework, adapts it to a real Turkish landscape (Köyceğiz–Marmaris), and packages the resulting heuristics into a decision-support tool that a forestry planner can actually use.
 
 ### 1.2 Identification, analysis, and solution methodology in brief
 
@@ -66,7 +111,7 @@ Two structural facts make the problem hard. The underlying combinatorial problem
 
 The first three weeks of the project went into understanding *which* features of the problem matter most. The 03.03.2026 meeting established that vertex count, density, and connectivity together drive difficulty levels (low-density narrow corridors are paradoxically easier to defend than high-density blob forests, because the cuts are smaller). The 10.03.2026 meeting compared three graph-generation paradigms and ruled out Erdős–Rényi graphs because their diameter is too small to mimic forest spread realistically; we settled on planar graphs (Delaunay triangulation with edge filters) for synthetic experimentation and on a map-derived planar graph for the real case. The 24.03.2026 meeting refined the vertex-definition rule (vertices represent forest patches and intervention points; lakes and mountains are excluded; edges are dropped where a road, river or bare strip blocks fire transfer). The 14.04.2026 meeting produced the design pivot: the original min-cut strategy was minimising *cut cost*, not *burned vertices*, and a saved/cost ratio reformulation was needed.
 
-We also looked at the operational data that is publicly available. ESA WorldCover (the European Space Agency's 10 m global land-cover product) gives a forest/shrub/grass/cropland/water/built-up classification of every 10 × 10 m pixel in Europe and is licensed permissively for non-commercial work. OpenStreetMap supplies village outlines, river polygons, and roads via the Overpass API. Together they specify, to within a hundred metres, where the forest is, where it is interrupted, and which natural barriers are available. For regional context, the EFFIS annual fire-statistics report for Europe, the Middle East and North Africa and the climate-driven drought analyses of Turco et al. (2017) confirm that the Mediterranean rim is in the highest severity band.
+We also looked at the operational data that is publicly available. ESA WorldCover (the European Space Agency's 10 m global land-cover product) gives a forest/shrub/grass/cropland/water/built-up classification of every 10 × 10 m pixel in Europe and is licensed permissively for non-commercial work. OpenStreetMap supplies village outlines, river polygons, and roads via the Overpass API. Together they specify, to within a hundred metres, where the forest is, where it is interrupted, and which natural barriers are available. For regional context, the EFFIS annual fire-statistics report for Europe, the Middle East and North Africa [11] and the climate-driven drought analyses of Turco et al. [12] confirm that the Mediterranean rim is in the highest severity band.
 
 ### 2.3 Needs and requirements of the system / customer
 
@@ -104,7 +149,7 @@ We also looked at the operational data that is publicly available. ESA WorldCove
 
 A systemic view of the design problem is given in Figure 1. The system sits between the planner and the data sources: it consumes geographic inputs and configuration parameters from the left, accepts policy and budget constraints from the stakeholder at the top, and produces three flows on the right — a strategy recommendation with a one-line justification, a quantitative performance report, and (through these) operational guidance to the human planner who remains the decision maker.
 
-![Context diagram of the *Stop the Fire!* decision-support system.](figures/context_diagram.svg){width=100%}
+![Context diagram of the *Stop the Fire!* decision-support system.](figures/context_diagram.pdf){width=100%}
 
 ### 2.7 Performance criteria and potential improvements
 
@@ -122,13 +167,13 @@ Potential improvements identified during identification, in approximately decrea
 
 ### 3.1 Literature overview
 
-The starting point of the literature is Hartnell's 1995 introduction of the Firefighter Problem at the 25th Manitoba Conference on Combinatorics. A fire breaks out at a vertex of a graph; at each step a firefighter protects up to k vertices, then the fire spreads to all unprotected neighbours of burning vertices. The goal is to minimise the number of burned vertices. Finbow and MacGillivray (2009) catalogue the early structural results: on infinite grids the problem becomes a tractable shape-design question; on trees with maximum degree three it is already NP-hard. Cai, Cheng, Verbin and Zhou (2010) give a tight 2-approximation for trees and an *e/(e − 1)*-approximation for the general problem under certain assumptions. On planar graphs of maximum degree at most four, the problem is APX-hard (King and MacGillivray, 2010), which closes the door on a polynomial-time exact algorithm for our setting.
+The starting point of the literature is Hartnell's 1995 introduction of the Firefighter Problem at the 25th Manitoba Conference on Combinatorics [1]. A fire breaks out at a vertex of a graph; at each step a firefighter protects up to k vertices, then the fire spreads to all unprotected neighbours of burning vertices. The goal is to minimise the number of burned vertices. Finbow and MacGillivray [2] catalogue the early structural results: on infinite grids the problem becomes a tractable shape-design question; on trees with maximum degree three it is already NP-hard. Cai, Cheng, Verbin and Zhou [3] give a tight 2-approximation for trees and an *e/(e − 1)*-approximation for the general problem under certain assumptions. On planar graphs of maximum degree at most four, the problem is APX-hard [4], which closes the door on a polynomial-time exact algorithm for our setting.
 
-Approximation and heuristic work then splits into two families. The *local greedy* family (max-degree, max-white-neighbours, save-the-most-savable) makes a single-step decision from a local feature of the fire front. The *structural* family treats the spread as a flow problem and computes min vertex/edge cuts between the burning set and a target set of "valuable" vertices. Anshelevich, Chakrabarty, Hate and Swamy (2012) study cut-based protection strategies and prove that, for any instance, an offline optimal protection plan can be encoded as an integer program with a polynomial number of cut constraints; in practice the IP is intractable for our graph sizes within field time-budgets, which is why heuristics dominate.
+Approximation and heuristic work then splits into two families. The *local greedy* family (max-degree, max-white-neighbours, save-the-most-savable) makes a single-step decision from a local feature of the fire front. The *structural* family treats the spread as a flow problem and computes min vertex/edge cuts between the burning set and a target set of "valuable" vertices. Anshelevich, Chakrabarty, Hate and Swamy [5] study cut-based protection strategies and prove that, for any instance, an offline optimal protection plan can be encoded as an integer program with a polynomial number of cut constraints; in practice the IP is intractable for our graph sizes within field time-budgets, which is why heuristics dominate.
 
-A third family is *lookahead and rollout*. Bertsekas's rollout framework (2019) shows that simulating a base policy for one or two steps inside the decision can capture multi-step dynamics that pure local heuristics miss; in the firefighter literature this is closely related to the subexponential exact algorithms of Cai, Verbin and Yang (2008), which exploit the same idea that bounded-depth lookahead on the spread tree carries most of the information needed for a good protection plan. The practical cost is one or two extra simulation calls per candidate, which is acceptable when the candidate set is pruned to a few dozen.
+A third family is *lookahead and rollout*. Bertsekas's rollout framework [7] shows that simulating a base policy for one or two steps inside the decision can capture multi-step dynamics that pure local heuristics miss; in the firefighter literature this is closely related to the subexponential exact algorithms of Cai, Verbin and Yang [6], which exploit the same idea that bounded-depth lookahead on the spread tree carries most of the information needed for a good protection plan. The practical cost is one or two extra simulation calls per candidate, which is acceptable when the candidate set is pruned to a few dozen.
 
-On the spatial side, the continuous fire-spread modelling literature (rate-of-spread models and operational descendants such as FARSITE) is largely orthogonal to our work: those models predict the physical front of a continuous fire under wind and topography, whereas we treat propagation as a discrete graph process. The bridge between the two paradigms is the vertex-placement step. We use Lloyd's k-means algorithm (Lloyd 1982) with density-weighted centroids to place graph vertices on dense forest patches extracted from the ESA WorldCover satellite raster (Zanaga et al. 2022), and we drop candidate edges that cross physical barriers (water, bare strips, settlements) derived from OpenStreetMap. The result is a discrete network that respects the geometry of the real landscape without committing to a continuous fire-physics model. The climate-driven motivation for studying Mediterranean wildfire containment specifically is established by Turco et al. (2017), who link summer Mediterranean fire activity to drought intensity, and is updated annually by the EFFIS report for Europe, the Middle East and North Africa.
+On the spatial side, the continuous fire-spread modelling literature (rate-of-spread models and operational descendants such as FARSITE) is largely orthogonal to our work: those models predict the physical front of a continuous fire under wind and topography, whereas we treat propagation as a discrete graph process. The bridge between the two paradigms is the vertex-placement step. We use Lloyd's k-means algorithm [8] with density-weighted centroids to place graph vertices on dense forest patches extracted from the ESA WorldCover satellite raster [9], and we drop candidate edges that cross physical barriers (water, bare strips, settlements) derived from OpenStreetMap [10]. The result is a discrete network that respects the geometry of the real landscape without committing to a continuous fire-physics model. The climate-driven motivation for studying Mediterranean wildfire containment specifically is established by Turco et al. [12], who link summer Mediterranean fire activity to drought intensity, and is updated annually by the EFFIS report for Europe, the Middle East and North Africa [11].
 
 ### 3.2 Alternative solution / design approaches
 
@@ -153,12 +198,14 @@ The model rests on four explicit assumptions, all carried unchanged from the pro
 
 ### 3.4 Brief overview of the selected approach
 
-The selected approach is a four-stage pipeline: **bbox → forest graph → strategy ensemble → recommended defence schedule**.
+The selected approach is a four-stage pipeline: **bbox → forest graph → strategy ensemble → recommended defence schedule** (Figure 2).
 
 * **Stage 1 (map-to-graph).** A user-supplied bounding box is intersected with the ESA WorldCover raster to produce a forest mask. The mask is the set of 10 m cells whose neighbourhood contains at least 55% forest fraction. Vertex count is parameterised by an area-per-vertex slider (default 500 ha/vertex, giving 101 vertices in Köyceğiz). Lloyd's k-means with k-means++ initialisation and 14 iterations places centroids on the densest cells; centroids that snap into non-forest holes are pushed to the nearest dense cell.
 * **Stage 2 (edge filter).** A Delaunay triangulation of the vertex set produces candidate edges. Five physical rules then filter the candidates: bare-strip > 60 m, settlement buffer < 600 m, river buffer < 80 m, water-on-path, low vegetation density. For Köyceğiz, 278 candidate edges are pruned to 172 active and 106 blocked. Blocked edges are kept in the data structure (greyed out in the UI) so the planner can see the natural barriers.
 * **Stage 3 (strategy ensemble).** Seven strategies plus a random baseline run on the resulting graph for a user-chosen fire origin and budget k. The strategies are described in detail in §4.
 * **Stage 4 (recommendation).** A topology fingerprint (graph diameter, average degree, density, articulation count, k value) classifies the instance into `delaunay_like`, `long_thin`, `obstacles`, or `hex_like`. A score table then ranks the strategies for that class; the winner and the runner-up are surfaced together with a one-sentence reason.
+
+![The four-stage map-to-graph pipeline: bounding box → ESA WorldCover forest mask → Lloyd's k-means vertex placement → Delaunay edges filtered by five physical barrier rules (rivers, settlements, bare strips). Active edges are black, blocked edges light grey.](figures/fig_pipeline.pdf){width=100%}
 
 The output is consumed by the web suite (§6.1), which also animates the chosen strategy turn by turn.
 
@@ -187,7 +234,9 @@ Every strategy starts from the same three pieces of information:
 2. **Fire front F.** All white vertices that have at least one red neighbour. Only vertices in F (or in their neighbourhood) are eligible to be protected.
 3. **Budget k.** The number of vertices the engine will protect this turn (k = 2 in the baseline).
 
-A turn proceeds as: strategy.select → engine protects top-k still-white candidates → fire spreads to every white neighbour of every red vertex → loop until F is empty (the fire is contained).
+A turn proceeds as: strategy.select → engine protects top-k still-white candidates → fire spreads to every white neighbour of every red vertex → loop until F is empty (the fire is contained). Figure 3 illustrates this protect-then-spread cycle on a 13-vertex toy graph.
+
+![Protect-then-spread mechanics on a 13-vertex toy graph with k = 2 per turn. The strategy protects two white vertices (dashed green rings) each turn; the engine then spreads fire to every white neighbour of every red vertex. The campaign ends at turn 3 when no red vertex has a white neighbour.](figures/fig_mechanics.pdf){width=100%}
 
 ### 4.2 Strategy 1 — Max Degree (local, baseline)
 
@@ -278,7 +327,9 @@ Random simply picks k vertices uniformly at random from the fire front F at each
 | Lookahead | One-Step Lookahead | Which pair minimises burned two turns from now? |
 | Baseline | Random | (no question — sanity check) |
 
-A class-to-file mapping for the implementations is given in Appendix B.
+A class-to-file mapping for the implementations is given in Appendix B; Figure 4 shows the three decision philosophies side-by-side on the same instance.
+
+![The three decision philosophies on the same instance (fire at vertex 0, k = 2). *Local greedy* protects the two white vertices with the most white neighbours; *structural* finds a vertex cut separating red from the dense saved set; *lookahead* simulates two turns for every candidate pair and picks the lowest burned count.](figures/fig_philosophies.pdf){width=100%}
 
 ---
 
@@ -288,7 +339,7 @@ A class-to-file mapping for the implementations is given in Appendix B.
 
 **Synthetic benchmark.** We ran each of the eight strategies on a paired sample of 594 instances per strategy, for a total of 4,752 single-strategy runs. Each instance was a (graph size, RNG seed, starting vertex, strategy) tuple with graph size ∈ {30, 60, 100}, 18 RNG seeds per size, and 11 starting vertices per graph. The same (graph, starting vertex) pair was used for all eight strategies so that the comparison is paired and controls for instance variance. All synthetic runs in this benchmark use the Delaunay generator; long-thin, hex and obstacle variants are implemented in the engine and exercised by the live demo, but were not included in this paired comparison so that the topology factor would not confound the strategy ranking. The intervention budget was fixed at k = 2 throughout, matching the default in the live demo and the midterm baseline.
 
-Table 5.1 reports the resulting rank, mean burned percentage, standard deviation, and mean per-turn runtime in milliseconds. The full factorial design — generator, RNG seeds, starting vertices, k sweep — is summarised in Appendix A.
+Table 5.1 reports the resulting rank, mean burned percentage, standard deviation, and mean per-turn runtime in milliseconds. The full factorial design — generator, RNG seeds, starting vertices, k sweep — is summarised in Appendix A. Figures 5–8 visualise the same data in four complementary ways: mean ranking with std bars (Figure 5), the cost–quality Pareto plane (Figure 6), the full per-run distribution (Figure 7), and the scaling behaviour with graph size (Figure 8).
 
 **Table 5.1 — Synthetic benchmark, 594 paired runs per strategy.**
 
@@ -303,9 +354,17 @@ Table 5.1 reports the resulting rank, mean burned percentage, standard deviation
 | 7 | min_cut_edge_front | 43.4 | 27.4 | 11.10 |
 | 8 | random | 70.1 | 19.0 | 0.23 |
 
+![Mean burned fraction per strategy on the 594-run synthetic Delaunay benchmark (error bars: 1 std). Bars coloured by philosophy. Lookahead leads by 11 percentage points; cut strategies cluster at 42–43%; random burns 70%.](figures/fig_strategy_ranking.pdf){width=80%}
+
+![Cost vs. quality: mean burned fraction against mean runtime per turn (log scale). Lookahead sits alone on the Pareto frontier (2.25 ms / 27.5%); local-greedy strategies are sub-millisecond but burn ~42%; cut strategies pay 11–50 ms without quality gains on average.](figures/fig_cost_quality.pdf){width=80%}
+
+![Burned-fraction distribution per strategy (boxplot, 594 runs each; whiskers at 1.5×IQR). Lookahead's IQR is ~15–35%; every other informed strategy has tail runs reaching 70–85% that pull the mean up.](figures/fig_distribution.pdf){width=80%}
+
+![Scaling of mean burned fraction with graph size n ∈ {30, 60, 100}. The gap between informed strategies and the random baseline widens with n; Lookahead stays flat at ~27–29% while the cut and greedy strategies climb from ~33% to ~50%.](figures/fig_size_scaling.pdf){width=80%}
+
 Two observations stand out. The 43-percentage-point gap between random and the best strategy is by itself a sanity check: every informed strategy is extracting meaningful structure from the graph, otherwise the ranking would collapse toward random. More usefully, the runner-up (Betweenness Front) is structurally different from the winner (Lookahead) and runs at roughly one-eighth of the latter's per-turn cost, which makes it a natural fallback for the recommendation engine when budget is tight. The three cut-based strategies, by contrast, cluster around 42–43% burned on average; they are not the best on aggregate, even though they win individual long-thin scenarios decisively (see §4.5 for the Min Damage Cut 12× ratio case).
 
-**Real-map case study.** We ran the same eight strategies on the Köyceğiz–Marmaris instance: 101 vertices, 172 active edges, 106 blocked edges, 50,280 ha of forest, fire origin at vertex 0 (the highest-degree hub, degree 7), k = 2. Table 5.2 reports the result.
+**Real-map case study.** We ran the same eight strategies on the Köyceğiz–Marmaris instance: 101 vertices, 172 active edges, 106 blocked edges, 50,280 ha of forest, fire origin at vertex 0 (the highest-degree hub, degree 7), k = 2. Table 5.2 and Figure 9 report the result.
 
 **Table 5.2 — Köyceğiz real-map case study, single run per strategy.**
 
@@ -319,6 +378,8 @@ Two observations stand out. The 43-percentage-point gap between random and the b
 | 6 | max_degree | 31.7 |
 | 6 | min_cut_edge_front | 31.7 |
 | 6 | random (baseline) | 31.7 |
+
+![Strategy comparison on the Köyceğiz–Marmaris real-map instance (101 vertices, 172 active edges, fire origin at the degree-7 hub, k = 2). Lookahead contains the fire to 16.8% — a 47% cut over random; Min Damage Cut and the hybrid tie at 19.8%; Max Degree and Min Cut Edge Front collapse to the random baseline.](figures/fig_koycegiz_bars.pdf){width=70%}
 
 The ordering matches the synthetic benchmark in the top half and in the bottom half. Lookahead is the clear winner; Min Damage Cut and the hybrid are tied for second; the local greedy on white neighbours is competitive; Max Degree and Min Cut Edge Front collapse to the random baseline level on this particular topology, confirming that they are picking up little useful signal here.
 
@@ -356,6 +417,16 @@ The deliverable is a working web suite, located in the `final suite/` directory 
 
 A field planner's interaction takes three clicks. (1) Pick a region on the Leaflet map either by typing coordinates, shift-dragging a bounding box, or selecting a preset (Köyceğiz, Toros Batı, Marmaris). The backend pulls the relevant ESA WorldCover tile (~50 MB the first time, cached on disk afterwards), runs the Overpass query for settlements and rivers (also cached), and returns a graph of forest vertices and physically traversable edges. (2) Click a vertex to set the fire origin and pick k on a slider. (3) Press "Run all strategies"; eight strategies compute in parallel in roughly 2 seconds, the results table appears, the recommendation card surfaces the suggested strategy with a one-sentence rationale, and the planner can press "Watch ▶" on any row to animate the chosen strategy's per-turn spread. The complete set of HTTP endpoints exposed by the backend is documented in Appendix C.
 
+Figures 10–13 walk through this three-click workflow on the live deployment at `firefighter-ie492.netlify.app/`.
+
+![Step 1 — Region selection. The planner picks a bbox by shift-drag on the Leaflet map, by typing bounds, or by selecting one of three presets (Köyceğiz, W. Taurus, Marmaris); area is computed live (589 km² shown). Sidebar exposes the vertex-resolution slider (default 500 ha/vertex) and minimum forest fraction (default 55%).](figures/screenshots/ws_01_landing.png){width=95%}
+
+![Step 2 — Graph build. The pipeline of Figure 2 yields 101 vertices, 172 active (teal) and 106 blocked (grey) edges; settlement labels come from the OSM Overpass extract. Fire origin (vertex 0, degree-7 hub) highlighted in orange.](figures/screenshots/ws_02_graph.png){width=95%}
+
+![Step 3 — Results. The eight strategies finish in ~2 s. Top-right: strategy comparison bar chart with philosophy badges (LOO/STR/GRE/HYB/BAS). Below: sortable table of burned %, burned/total, protected, turns, and runtime. Bottom-left card surfaces the recommendation; each row has a "Watch" button into the per-turn animation.](figures/screenshots/ws_03_results.png){width=95%}
+
+![Step 4 — Per-turn animation, final frame (turn 4 of 4) for one_step_lookahead on Köyceğiz: 17 red burnt vertices in the south-west, 8 green protected vertices forming a cut along the spread direction, 76 white vertices the fire never reached. The play-bar lets the planner pause, scrub, or restart.](figures/screenshots/ws_05_animation_end.png){width=95%}
+
 ### 6.2 Integration with the overall system
 
 The web suite is designed as a standalone planning tool first and as an integration point second. The principal integration target is OGM's detection layer: today, fire detection in Turkey is done by a combination of tower lookouts, citizen reporting, and satellite cross-check. If the detection layer emitted a structured (lat, lon, timestamp) feed, the suite's `/api/simulate` endpoint could accept it directly, choose the nearest vertex as the fire origin, and emit a recommended defence schedule within seconds. The current `/api/recommend` endpoint already returns a structured JSON payload (primary, runner-up, reason, confidence, scores, fingerprint) that is ready to be consumed by a downstream dashboard.
@@ -386,7 +457,7 @@ The project integrates a wide cross-section of the industrial engineering toolki
 
 The practical merit is concrete: a working web suite that takes a real bounding box, builds a real graph from open satellite and street data, and runs the eight-strategy ensemble in real time. We tested the suite on three Mediterranean regions (Köyceğiz, Toros Batı, Marmaris); the average end-to-end time from bbox to recommendation is under five seconds the first time and under two seconds on cache hits. As far as we are aware no comparable end-to-end tool exists for the Turkish operational context.
 
-Methodologically the project is interesting for two reasons. The min-cut → min-damage-cut reformulation — driven by the supervisor's 14 April critique that the original cut strategy was optimising the wrong objective — is a clean example of how reframing an optimisation question (from cost-of-cut to saved-per-cost ratio) can produce a 23% relative improvement within a single strategy family. The one-step lookahead policy is, in the same spirit, an application of rollout theory (Bertsekas 2019) to a domain where it had not previously been documented for the planar Firefighter Problem on a GIS-derived graph: simulating two turns of the engine inside the engine itself yields the largest single performance jump in our benchmark.
+Methodologically the project is interesting for two reasons. The min-cut → min-damage-cut reformulation — driven by the supervisor's 14 April critique that the original cut strategy was optimising the wrong objective — is a clean example of how reframing an optimisation question (from cost-of-cut to saved-per-cost ratio) can produce a 23% relative improvement within a single strategy family. The one-step lookahead policy is, in the same spirit, an application of rollout theory [7] to a domain where it had not previously been documented for the planar Firefighter Problem on a GIS-derived graph: simulating two turns of the engine inside the engine itself yields the largest single performance jump in our benchmark.
 
 The educational merit is harder to quantify but matters for the tool's intended audience. The strategy ensemble is organised around three distinct decision philosophies (local greedy, global structural, forward-looking) with a documented best representative in each, so a planner using the tool gets, alongside the recommendation, a short explanation of why different topologies favour different policies. This was a deliberate choice that goes beyond the minimisation objective and matches the supervisor's repeated framing of the project as a decision-support mechanism rather than a black-box optimiser.
 
@@ -402,7 +473,7 @@ The educational merit is harder to quantify but matters for the tool's intended 
 
 ## References
 
-The references below are the works we drew on for problem framing, algorithm design, data sources and implementation tooling. Authors are cited in the body by name (e.g., "Hartnell 1995"); the numeric labels here are for cross-reference convenience only.
+The references below are the works we drew on for problem framing, algorithm design, data sources and implementation tooling. Citations in the body use the IEEE numeric format [n], referring back to the entries in this list.
 
 [1] B. L. Hartnell, "Firefighter! An application of domination," in *Proc. 25th Manitoba Conf. Combinatorial Mathematics and Computing*, Univ. of Manitoba, Winnipeg, 1995.
 
